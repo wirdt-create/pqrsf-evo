@@ -36,14 +36,14 @@ services:
     networks: [pqrsf]
 
   minio:
-    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+    image: bitnami/minio:latest.2025-04-22T22-12-26Z
     restart: unless-stopped
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:?Define MINIO_ROOT_USER en .env}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?Define MINIO_ROOT_PASSWORD en .env}
     command: ["server", "/data", "--console-address", ":9001"]
     volumes:
-      - minio_data:/data
+      - miniodata:/bitnami/minio/data
     networks: [pqrsf]
 
   backend:
