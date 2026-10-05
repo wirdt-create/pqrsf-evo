@@ -1,0 +1,16 @@
+# Secrets and local overrides
+.env
+.env.*
+!.env.example
+
+# Dependencies and build output
+node_modules/
+**/node_modules/
+dist/
+coverage/
+*.log
+
+# Prisma generated client and local editor files
+backend/src/generated/prisma/
+.vscode/
+.DS_Store

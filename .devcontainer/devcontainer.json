@@ -1,0 +1,18 @@
+{
+  "name": "PQRSF EVO (Codespaces)",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "backend",
+  "workspaceFolder": "/workspace",
+  "forwardPorts": [3000, 5173, 5432, 6379, 9000, 9001, 8025],
+  "portsAttributes": {
+    "3000": { "label": "API NestJS" },
+    "5173": { "label": "Frontend Vite", "onAutoForward": "openBrowser" },
+    "5432": { "label": "PostgreSQL" },
+    "6379": { "label": "Redis" },
+    "9000": { "label": "MinIO API" },
+    "9001": { "label": "Consola MinIO" },
+    "8025": { "label": "Mailpit" }
+  },
+  "postCreateCommand": "npm --prefix /app install && npm --prefix /workspace/frontend install",
+  "shutdownAction": "stopCompose"
+}
