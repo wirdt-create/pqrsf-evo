@@ -40,7 +40,7 @@ services:
       - pqrsf
 
   minio:
-    image: bitnami/minio:latest.2025-04-22T22-12-26Z
+    image: bitnami/minio:latest
     restart: unless-stopped
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-pqrsf_minio}
