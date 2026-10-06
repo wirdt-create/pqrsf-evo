@@ -141,7 +141,7 @@ services:
 volumes:
   postgres_data:
   redis_data:
-  minio_data:
+  miniodata:
   backend_node_modules:
   frontend_node_modules:
 
