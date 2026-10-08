@@ -15,7 +15,7 @@ export type CreatePqrsfResult = {
 };
 
 export async function createPqrsf(input: CreatePqrsfInput): Promise<CreatePqrsfResult> {
-  const response = await fetch('/pqrsf', {
+  const response = await fetch('/api/pqrsf', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input),

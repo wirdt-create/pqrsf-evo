@@ -120,6 +120,7 @@ services:
     environment:
       NODE_ENV: development
       VITE_API_URL: http://localhost:${API_PORT:-3000}
+      VITE_BACKEND_PROXY: http://backend:3000
       CHOKIDAR_USEPOLLING: "true"
     ports:
       - "${FRONTEND_PORT:-5173}:5173"

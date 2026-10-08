@@ -14,3 +14,4 @@ coverage/
 backend/src/generated/prisma/
 .vscode/
 .DS_Store
+*.tsbuildinfo

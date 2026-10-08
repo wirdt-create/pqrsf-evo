@@ -38,144 +38,144 @@ enum MotivoRechazoRespuesta {
 }
 
 model Usuario {
-  id                 String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  nombre             String              @db.Text
-  correo             String              @unique @db.Text
-  passwordHash       String              @map("password_hash") @db.Text
-  rol                RolUsuario
-  area               String?             @db.Text
-  activo             Boolean             @default(true)
-  creadoEn           DateTime            @default(now()) @map("creado_en") @db.Timestamptz(6)
-  pqrsfResponsables  Pqrsf[]             @relation("PqrsfResponsable")
-  respuestasPropuestas Pqrsf[]            @relation("RespuestaPropuestaPor")
-  asignaciones       MatrizAsignacion[]  @relation("AgenteResponsable")
-  avances            BitacoraAvance[]
-  accionesResponsable AccionCorrectiva[] @relation("AccionResponsable")
-  logsAuditoria      LogAuditoria[]
+  id                    String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nombre                String
+  correo                String             @unique
+  password_hash         String
+  rol                   RolUsuario
+  area                  String?
+  activo                Boolean            @default(true)
+  creado_en             DateTime           @default(now()) @db.Timestamptz(6)
+  asignaciones          MatrizAsignacion[]
+  pqrsf_asignadas       Pqrsf[]            @relation("PqrsfResponsable")
+  respuestas_propuestas Pqrsf[]            @relation("PqrsfRespuestaPropuestaPor")
+  avances               BitacoraAvance[]
+  acciones_correctivas  AccionCorrectiva[]
+  logs_auditoria        LogAuditoria[]
 
   @@map("usuarios")
 }
 
 model ConfigSla {
-  id                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  tipoPqrsf           String   @unique @map("tipo_pqrsf") @db.Text
-  diasHabilesLimite   Int      @map("dias_habiles_limite")
-  diasAlertaAmarilla  Int      @map("dias_alerta_amarilla")
-  activo              Boolean  @default(true)
+  id                   String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tipo_pqrsf           String  @unique
+  dias_habiles_limite  Int
+  dias_alerta_amarilla Int
+  activo               Boolean @default(true)
 
   @@map("config_sla")
 }
 
 model MatrizAsignacion {
   id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  proceso            String   @db.Text
-  tipoPqrsf          String   @map("tipo_pqrsf") @db.Text
-  agenteResponsable  String?  @map("agente_responsable") @db.Uuid
-  area               String   @db.Text
+  proceso            String
+  tipo_pqrsf         String
+  agente_responsable String?  @db.Uuid
+  area               String
   activo             Boolean  @default(true)
-  usuarioResponsable Usuario? @relation("AgenteResponsable", fields: [agenteResponsable], references: [id])
+  agente             Usuario? @relation(fields: [agente_responsable], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   @@map("matriz_asignacion")
 }
 
 model Pqrsf {
-  id                         String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  idRadicado                 String                    @unique @map("id_radicado") @db.Text
-  nombreSolicitante          String                    @map("nombre_solicitante") @db.Text
-  idNitSolicitante           String                    @map("id_nit_solicitante") @db.Text
-  correoSolicitante          String                    @map("correo_solicitante") @db.Text
-  tipoUsuario                String                    @map("tipo_usuario") @db.Text
-  tipoPqrsf                  String                    @map("tipo_pqrsf") @db.Text
-  procesoRelacionado         String                    @map("proceso_relacionado") @db.Text
-  descripcionSolicitud      String                    @map("descripcion_solicitud") @db.Text
-  fechaRadicacion            DateTime                  @default(now()) @map("fecha_radicacion") @db.Timestamptz(6)
-  estado                     EstadoPqrsf               @default(RADICADA)
-  responsableId              String?                   @map("responsable_id") @db.Uuid
-  fechaInicioGestion         DateTime?                 @map("fecha_inicio_gestion") @db.Timestamptz(6)
-  fechaLimiteSla              DateTime?                 @map("fecha_limite_sla") @db.Date
-  descripcionCausa           String?                   @map("descripcion_causa") @db.Text
-  esErrorHumano              Boolean?                  @map("es_error_humano")
-  descripcionSolucion        String?                   @map("descripcion_solucion") @db.Text
-  tipoSolucion               String?                   @map("tipo_solucion") @db.Text
-  metodoCierre               String?                   @map("metodo_cierre") @db.Text
-  ameritaAccionCorrectiva    Boolean?                  @default(false) @map("amerita_accion_correctiva")
-  clienteSatisfecho          Boolean?                  @map("cliente_satisfecho")
-  explicacionInsatisfaccion  String?                   @map("explicacion_insatisfaccion") @db.Text
-  repetibilidad              String?                   @db.Text
-  encuestaEnviada            Boolean                   @default(false) @map("encuesta_enviada")
-  numReplicas                Int                       @default(0) @map("num_replicas")
-  replicasAgotadas           Boolean                   @default(false) @map("replicas_agotadas")
-  motivoEscalamiento         String?                   @map("motivo_escalamiento") @db.Text
-  respuestaPropuesta         String?                   @map("respuesta_propuesta") @db.Text
-  respuestaPropuestaPor      String?                   @map("respuesta_propuesta_por") @db.Uuid
-  respuestaPropuestaEn       DateTime?                 @map("respuesta_propuesta_en") @db.Timestamptz(6)
-  motivoRechazoRespuesta     MotivoRechazoRespuesta?   @map("motivo_rechazo_respuesta")
-  comentarioRechazoRespuesta String?                   @map("comentario_rechazo_respuesta") @db.Text
-  creadoEn                   DateTime                  @default(now()) @map("creado_en") @db.Timestamptz(6)
-  actualizadoEn              DateTime                  @default(now()) @map("actualizado_en") @db.Timestamptz(6)
-  responsable                Usuario?                  @relation("PqrsfResponsable", fields: [responsableId], references: [id])
-  proponenteRespuesta        Usuario?                  @relation("RespuestaPropuestaPor", fields: [respuestaPropuestaPor], references: [id])
-  avances                    BitacoraAvance[]
-  accionesCorrectivas        AccionCorrectiva[]
-  encuestas                  Encuesta[]
+  id                           String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_radicado                  String                  @unique
+  nombre_solicitante           String
+  id_nit_solicitante           String
+  correo_solicitante           String
+  tipo_usuario                 String
+  tipo_pqrsf                   String
+  proceso_relacionado          String
+  descripcion_solicitud        String
+  fecha_radicacion             DateTime                @default(now()) @db.Timestamptz(6)
+  estado                       EstadoPqrsf             @default(RADICADA)
+  responsable_id               String?                 @db.Uuid
+  fecha_inicio_gestion         DateTime?               @db.Timestamptz(6)
+  fecha_limite_sla             DateTime?               @db.Date
+  descripcion_causa            String?
+  es_error_humano              Boolean?
+  descripcion_solucion         String?
+  tipo_solucion                String?
+  metodo_cierre                String?
+  amerita_accion_correctiva    Boolean?                @default(false)
+  cliente_satisfecho           Boolean?
+  explicacion_insatisfaccion   String?
+  repetibilidad                String?
+  encuesta_enviada             Boolean                 @default(false)
+  num_replicas                 Int                     @default(0)
+  replicas_agotadas            Boolean                 @default(false)
+  motivo_escalamiento          String?
+  respuesta_propuesta          String?
+  respuesta_propuesta_por      String?                 @db.Uuid
+  respuesta_propuesta_en       DateTime?               @db.Timestamptz(6)
+  motivo_rechazo_respuesta     MotivoRechazoRespuesta?
+  comentario_rechazo_respuesta String?
+  creado_en                    DateTime                @default(now()) @db.Timestamptz(6)
+  actualizado_en               DateTime                @default(now()) @updatedAt @db.Timestamptz(6)
+  responsable                  Usuario?                @relation("PqrsfResponsable", fields: [responsable_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  respuesta_propuesta_usuario  Usuario?                @relation("PqrsfRespuestaPropuestaPor", fields: [respuesta_propuesta_por], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  avances                      BitacoraAvance[]
+  acciones_correctivas         AccionCorrectiva[]
+  encuestas                    Encuesta[]
 
-  @@index([fechaRadicacion], map: "idx_pqrsf_fecha_radicacion")
+  @@index([fecha_radicacion], map: "idx_pqrsf_fecha_radicacion")
   @@index([estado], map: "idx_pqrsf_estado")
-  @@index([responsableId], map: "idx_pqrsf_responsable")
+  @@index([responsable_id], map: "idx_pqrsf_responsable")
   @@map("pqrsf")
 }
 
 model BitacoraAvance {
-  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  pqrsfId     String    @map("pqrsf_id") @db.Uuid
-  usuarioId   String?   @map("usuario_id") @db.Uuid
-  descripcion String    @db.Text
-  adjuntoUrl  String?   @map("adjunto_url") @db.Text
-  creadoEn    DateTime  @default(now()) @map("creado_en") @db.Timestamptz(6)
-  pqrsf       Pqrsf     @relation(fields: [pqrsfId], references: [id], onDelete: Cascade)
-  usuario     Usuario?  @relation(fields: [usuarioId], references: [id])
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  pqrsf_id    String   @db.Uuid
+  usuario_id  String?  @db.Uuid
+  descripcion String
+  adjunto_url String?
+  creado_en   DateTime @default(now()) @db.Timestamptz(6)
+  pqrsf       Pqrsf    @relation(fields: [pqrsf_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  usuario     Usuario? @relation(fields: [usuario_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   @@map("bitacora_avances")
 }
 
 model AccionCorrectiva {
-  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  pqrsfIdOrigen     String    @map("pqrsf_id_origen") @db.Uuid
-  causaRaiz         String    @map("causa_raiz") @db.Text
-  descripcionAccion String    @map("descripcion_accion") @db.Text
-  responsableId     String?   @map("responsable_id") @db.Uuid
-  fechaCompromiso   DateTime? @map("fecha_compromiso") @db.Date
-  estado            String    @default("ABIERTA") @db.Text
-  fechaVerificacion DateTime? @map("fecha_verificacion") @db.Date
-  evidenciasUrl     String?   @map("evidencias_url") @db.Text
-  pqrsf             Pqrsf     @relation(fields: [pqrsfIdOrigen], references: [id])
-  responsable       Usuario?  @relation("AccionResponsable", fields: [responsableId], references: [id])
+  id                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  pqrsf_id_origen    String    @db.Uuid
+  causa_raiz         String
+  descripcion_accion String
+  responsable_id     String?   @db.Uuid
+  fecha_compromiso   DateTime? @db.Date
+  estado             String    @default("ABIERTA")
+  fecha_verificacion DateTime? @db.Date
+  evidencias_url     String?
+  pqrsf              Pqrsf     @relation(fields: [pqrsf_id_origen], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  responsable        Usuario?  @relation(fields: [responsable_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   @@map("acciones_correctivas")
 }
 
 model Encuesta {
-  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  pqrsfId     String    @map("pqrsf_id") @db.Uuid
-  enviadaEn   DateTime  @default(now()) @map("enviada_en") @db.Timestamptz(6)
-  respondida  Boolean   @default(false)
-  respondidaEn DateTime? @map("respondida_en") @db.Timestamptz(6)
-  satisfecho  Boolean?
-  comentario  String?   @db.Text
-  pqrsf       Pqrsf     @relation(fields: [pqrsfId], references: [id])
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  pqrsf_id      String    @db.Uuid
+  enviada_en    DateTime  @default(now()) @db.Timestamptz(6)
+  respondida    Boolean   @default(false)
+  respondida_en DateTime? @db.Timestamptz(6)
+  satisfecho    Boolean?
+  comentario    String?
+  pqrsf         Pqrsf     @relation(fields: [pqrsf_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
   @@map("encuestas")
 }
 
 model LogAuditoria {
-  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  fecha             DateTime  @default(now()) @db.Timestamptz(6)
-  usuarioId         String?   @map("usuario_id") @db.Uuid
-  entidadModificada String    @map("entidad_modificada") @db.Text
-  campo             String    @db.Text
-  valorAnterior     String?   @map("valor_anterior") @db.Text
-  valorNuevo        String?   @map("valor_nuevo") @db.Text
-  usuario           Usuario?  @relation(fields: [usuarioId], references: [id])
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fecha              DateTime @default(now()) @db.Timestamptz(6)
+  usuario_id         String?  @db.Uuid
+  entidad_modificada String
+  campo              String
+  valor_anterior     String?
+  valor_nuevo        String?
+  usuario            Usuario? @relation(fields: [usuario_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   @@map("log_auditoria")
 }

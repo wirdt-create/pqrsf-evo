@@ -60,5 +60,6 @@ export class CreatePqrsfDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(4096)
   captcha_token?: string;
 }
